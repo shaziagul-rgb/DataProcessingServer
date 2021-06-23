@@ -2,7 +2,7 @@ const { timeStamp } = require('console');
 const express = require('express')
 const app = express()
 const port = 3001;
-Canvas = require('canvas');
+
 var fs = require("fs");
 var filecounter = 1;
 
