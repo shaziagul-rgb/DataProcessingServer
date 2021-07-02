@@ -4,7 +4,10 @@ const app = express()
 const port = 3001;
 
 var fs = require("fs");
+
 var filecounter = 1;
+
+
 
 function rawBody(req, res, next) {
    var chunks = [];
@@ -33,18 +36,53 @@ function getRandomFileName() {
    return random_number;
    }
 
+function CreateNewFolderIfNotExit(foldername)
+{
+   
+    if(fs.existsSync(__dirname+"/"+foldername+"/"))
+    {
+        console.log("Already Exit");
+    }
+    else
+    {
+        
+         fs.mkdirSync(__dirname+"/"+foldername);
+    }
+}
+function CreateFolderStructure()
+{
+    CreateNewFolderIfNotExit("test");
+    CreateNewFolderIfNotExit("test/calibration");
+    CreateNewFolderIfNotExit("test/poses");
+    CreateNewFolderIfNotExit("test/rgb");
+}
+app.post('/createfolder',function(req,res)
+{
+    CreateFolderStructure();
+  
+        res.status(200, {status: 'Folder Created Successfull'});
+});
+
 app.post('/upload-image', rawBody, function (req, res) {
 
+  
    if (req.rawBody && req.bodyLength > 0) {
     
-      // var data = req.rawBody.replace(/^data:image\/\w+;base64,/, "");
-      // var buf = new Buffer.from(data, 'base64');
-     /// var filename = 
-     fs.writeFile(__dirname + "/" + filecounter+".png", req.rawBody, err => {
+     fs.writeFile(__dirname + "/test/rgb/" + filecounter+".jpg", req.rawBody, err => {
     if (err) throw err;
     console.log('Saved!');
     filecounter++;
    })
+   fs.writeFile(__dirname + "/test/calibration/" + filecounter+".jpg"+".calibration"+".txt","658.999", err => {
+    if (err) throw err;
+
+   })
+   array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
+   fs.writeFile(__dirname + "/test/poses/" + filecounter+".jpg"+".poses"+".txt",array, err => {
+    if (err) throw err;
+
+   })
+   
        // TODO save image (req.rawBody) somewhere
 
        // send some content as JSON
@@ -55,9 +93,11 @@ app.post('/upload-image', rawBody, function (req, res) {
 
 });
 
-app.get('/test',function(req,res)
+app.get('/runBatchFile',function(req,res)
 {
-   res.send(200, {status: 'OK'});
+    const { exec } = require('child_process');
+
+    exec(__dirname+ "/batch.bat");
 });
 
   app.listen(port, () => {
