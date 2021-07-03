@@ -51,7 +51,8 @@ function CreateNewFolderIfNotExist(foldername)
    
     if(fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername))
     {
-        fs.rmdir("/home/shazia/esac/datasets/fbs/"+foldername);
+        fs.rmdirSync("/home/shazia/esac/datasets/fbs/"+foldername, { recursive: true });
+        // fs.rmdir("/home/shazia/esac/datasets/fbs/"+foldername);
         console.log("Already Exit");
     }
     else
