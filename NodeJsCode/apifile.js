@@ -4,7 +4,7 @@ const app = express()
 const port = 3001;
 
 var fs = require("fs");
-
+var cron = require('node-cron');
 var filecounter = 1;
 
 
@@ -29,6 +29,16 @@ function rawBody(req, res, next) {
        res.status(500);
    });
 }
+
+function RunCronJob()
+{
+    cron.schedule('10 * * * *', () => {
+        console.log('Cron Job Runing------- ');
+        const { exec } = require('child_process');
+        exec( "/home/shazia/ARscript.sh");
+      });
+}
+
 function getRandomFileName() {
    var timestamp = new Date().toISOString().replace(/[-:.]/g,"");  
    var random = ("" + Math.random()).substring(2, 8); 
@@ -45,14 +55,12 @@ function CreateNewFolderIfNotExist(foldername)
         console.log("Already Exit");
     }
     else
-    
     {
 
-    
-
          fs.mkdirSync("/home/shazia/esac/datasets/fbs/"+foldername);
+    }
 }
-}
+
 function CreateFolderStructure()
 {
    
@@ -104,7 +112,10 @@ app.post('/runBatchFile',function(req,res)
 
     exec( "/home/shazia/ARscript.sh");
 });
-
+app.post('/runCronJob',function(req,res)
+{
+   RunCronJob();
+});
   app.listen(port, () => {
     console.log(`Server app listening at http://localhost:${port}`)
   })
