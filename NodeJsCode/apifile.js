@@ -32,12 +32,12 @@ function rawBody(req, res, next) {
 
 function RunCronJob()
 {
-  var task =  cron.schedule('10 * * * *', () => {
+    cron.schedule("*/10 * * * * *", () => {
         console.log('Cron Job Runing-------\n ');
         const { exec } = require('child_process');
        exec( "/home/shazia/ARscript.sh");
       });
-      task.start();
+    
 }
 
 function getRandomFileName() {
