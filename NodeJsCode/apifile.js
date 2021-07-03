@@ -36,25 +36,30 @@ function getRandomFileName() {
    return random_number;
    }
 
-function CreateNewFolderIfNotExit(foldername)
+function CreateNewFolderIfNotExist(foldername)
 {
    
-    if(fs.existsSync(__dirname+"/"+foldername+"/"))
+    if(fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername))
     {
+        fs.rmdir("/home/shazia/esac/datasets/fbs/"+foldername);
         console.log("Already Exit");
     }
     else
+    
     {
-        
-         fs.mkdirSync(__dirname+"/"+foldername);
-    }
+
+    
+
+         fs.mkdirSync("/home/shazia/esac/datasets/fbs/"+foldername);
+}
 }
 function CreateFolderStructure()
 {
-    CreateNewFolderIfNotExit("test");
-    CreateNewFolderIfNotExit("test/calibration");
-    CreateNewFolderIfNotExit("test/poses");
-    CreateNewFolderIfNotExit("test/rgb");
+   
+    CreateNewFolderIfNotExist("test");
+    CreateNewFolderIfNotExist("test/calibration");
+    CreateNewFolderIfNotExist("test/poses");
+    CreateNewFolderIfNotExist("test/rgb");
 }
 app.post('/createfolder',function(req,res)
 {
@@ -68,17 +73,17 @@ app.post('/upload-image', rawBody, function (req, res) {
   
    if (req.rawBody && req.bodyLength > 0) {
     
-     fs.writeFile(__dirname + "/test/rgb/" + filecounter+".jpg", req.rawBody, err => {
+     fs.writeFile( "/home/shazia/esac/datasets/fbs/test/rgb/" + filecounter+".jpg", req.rawBody, err => {
     if (err) throw err;
     console.log('Saved!');
     filecounter++;
    })
-   fs.writeFile(__dirname + "/test/calibration/" + filecounter+".jpg"+".calibration"+".txt","658.999", err => {
+   fs.writeFile( "/home/shazia/esac/datasets/fbs/test/calibration/" + filecounter+".jpg"+".calibration"+".txt","658.999", err => {
     if (err) throw err;
 
    })
    array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
-   fs.writeFile(__dirname + "/test/poses/" + filecounter+".jpg"+".poses"+".txt",array, err => {
+   fs.writeFile( "/home/shazia/esac/datasets/fbs/test/poses/" + filecounter+".jpg"+".poses"+".txt",array, err => {
     if (err) throw err;
 
    })
@@ -93,13 +98,13 @@ app.post('/upload-image', rawBody, function (req, res) {
 
 });
 
-app.get('/runBatchFile',function(req,res)
+app.post('/runBatchFile',function(req,res)
 {
     const { exec } = require('child_process');
 
-    exec(__dirname+ "/batch.bat");
+    exec( "/home/shazia/ARscript.sh");
 });
 
   app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Server app listening at http://localhost:${port}`)
   })
