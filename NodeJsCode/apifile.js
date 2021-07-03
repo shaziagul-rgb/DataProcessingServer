@@ -118,6 +118,12 @@ app.post('/runCronJob',function(req,res)
 {
    RunCronJob();
 });
+app.get('/readPosesfile',function(req,res)
+{
+        fs.readFile("/home/shazia/esac/environments/fbs/poses_esac_.txt", function (err, data) {
+            res.end(data);
+    });
+});
   app.listen(port, () => {
     console.log(`Server app listening at http://localhost:${port}`)
   })
