@@ -1,12 +1,14 @@
-const { timeStamp } = require('console');
+const { timeStamp, debug } = require('console');
 const express = require('express')
 const app = express()
 const port = 3001;
+var rimraf = require("rimraf");
 
 var fs = require("fs");
 var cron = require('node-cron');
+const path = require('path');
 var filecounter = 1;
-
+var foldername="/home/shazia/";
 
 
 function rawBody(req, res, next) {
@@ -50,50 +52,99 @@ function getRandomFileName() {
 function CreateNewFolderIfNotExist(foldername)
 {
    
-    if(fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername))
-    {
-        fs.rmdirSync("/home/shazia/esac/datasets/fbs/"+foldername, { recursive: true });
-        // fs.rmdir("/home/shazia/esac/datasets/fbs/"+foldername);
-        console.log("Already Exit");
-    }
-    else
-    {
+    // if(fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername))
+    // {
+    //     rimraf("/home/shazia/esac/datasets/fbs/"+foldername, function () { console.log("done"); });
+    //    // fs.rmdirSync("/home/shazia/esac/datasets/fbs/"+foldername, { recursive: true });
+    //     // fs.rmdir("/home/shazia/esac/datasets/fbs/"+foldername);
+    //     console.log("Already Exist");
+    // }
+    // else
+    // {
 
-         fs.mkdirSync("/home/shazia/esac/datasets/fbs/"+foldername);
-    }
+         fs.mkdirSync(foldername+"/home/shazia/esac/datasets/fbs/");
+         console.log(foldername+"Created folder");
+   // }
 }
 
-function CreateFolderStructure()
+function DelFolderData()
 {
+
+//  if(fs.existsSync("/home/shazia/esac/datasets/fbs/"+"test"))
+//      {
+//         rimraf("/home/shazia/esac/datasets/fbs/"+"test", function () { console.log("done"); });
+//     }    
    
-    CreateNewFolderIfNotExist("test");
-    CreateNewFolderIfNotExist("test/calibration");
-    CreateNewFolderIfNotExist("test/poses");
-    CreateNewFolderIfNotExist("test/rgb");
+//     CreateNewFolderIfNotExist("test");
+//     CreateNewFolderIfNotExist("test/calibration");
+//     CreateNewFolderIfNotExist("test/poses");
+//     CreateNewFolderIfNotExist("test/rgb");
+
+const subdir1 = foldername+"esac/datasets/fbs/test/rgb";
+const subdir2= foldername+"esac/datasets/fbs/test/poses";
+const subdir3 = foldername+"esac/datasets/fbs/test/calibration";
+
+
+
+
+fs.readdir(subdir1, (err, files) => {
+  if (err) throw err;
+
+  for (const file of files) {
+    fs.unlink(path.join(subdir1, file), err => {
+      if (err) throw err;
+
+    });
+  }
+});
+
+fs.readdir(subdir2, (err, files) => {
+    if (err) throw err;
+  
+    for (const file of files) {
+      fs.unlink(path.join(subdir2, file), err => {
+        if (err) throw err;
+  
+      });
+    }
+  });
+
+  fs.readdir(subdir3, (err, files) => {
+    if (err) throw err;
+  
+    for (const file of files) {
+      fs.unlink(path.join(subdir3, file), err => {
+        if (err) throw err;
+  
+      });
+    }
+  });
+
+
+
 }
+
 app.post('/createfolder',function(req,res)
 {
-    CreateFolderStructure();
-  
-        res.status(200, {status: 'Folder Created Successfull'});
+    console.log("Create Folder API Called");
+    DelFolderData();
+    res.status(200, {status: 'Folder Created Successfull'});
 });
 
 app.post('/upload-image', rawBody, function (req, res) {
 
-  
    if (req.rawBody && req.bodyLength > 0) {
     
-     fs.writeFile( "/home/shazia/esac/datasets/fbs/test/rgb/" + filecounter+".jpg", req.rawBody, err => {
+     fs.writeFile( foldername+"esac/datasets/fbs/test/rgb/" + filecounter+".jpg", req.rawBody, err => {
     if (err) throw err;
-    console.log('Saved!');
     filecounter++;
    })
-   fs.writeFile( "/home/shazia/esac/datasets/fbs/test/calibration/" + filecounter+".jpg"+".calibration"+".txt","658.999", err => {
+   fs.writeFile( foldername+"esac/datasets/fbs/test/calibration/" + filecounter+".jpg"+".calibration"+".txt","658.999", err => {
     if (err) throw err;
 
    })
    array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
-   fs.writeFile( "/home/shazia/esac/datasets/fbs/test/poses/" + filecounter+".jpg"+".poses"+".txt",array, err => {
+   fs.writeFile( foldername+"esac/datasets/fbs/test/poses/" + filecounter+".jpg"+".poses"+".txt",array, err => {
     if (err) throw err;
 
    })
@@ -108,11 +159,18 @@ app.post('/upload-image', rawBody, function (req, res) {
 
 });
 
+
+
+       // TODO save image (req.rawBody) somewhere
+
+   
 app.post('/runBatchFile',function(req,res)
 {
     const { exec } = require('child_process');
+    fs.unlinkSync(foldername+"esac/environments/fbs/poses_esac_.txt")
 
-    exec( "/home/shazia/ARscript.sh");
+    exec( foldername+"ARscript.sh");
+    console.log("Batch FIle");
 });
 app.post('/runCronJob',function(req,res)
 {
@@ -120,8 +178,8 @@ app.post('/runCronJob',function(req,res)
 });
 app.get('/readPosesfile',function(req,res)
 {
-        fs.readFile("/home/shazia/esac/environments/fbs/poses_esac_.txt", function (err, data) {
-            res.end(data);
+        fs.readFile(foldername+"esac/environments/fbs/poses_esac_.txt", function (err, data) {
+        res.end(data);
     });
 });
   app.listen(port, () => {
