@@ -4,4 +4,4 @@ cd ARSpecServer/NodeJsCode
 
 node apifile.js
 
-![GitHub Logo](/images/logo.png)
+
