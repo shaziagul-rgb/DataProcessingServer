@@ -1,10 +1,9 @@
-
 # Pre Req
 
-  Setup ESAC project in Home Directory.
-  Setup pointcloudvisar project in Home Directory
-  Setup Col-Map reconstruction folder in Home Directory.
-  Change the folder-name in apifile.js
+  *Setup ESAC project in Home Directory.
+  *Setup pointcloudvisar project in Home Directory
+  *Setup Col-Map reconstruction folder in Home Directory.
+  *Change the folder-name in apifile.js
 
 # Howto run
 
@@ -15,7 +14,7 @@ cd ARSpecServer/NodeJsCode
 node apifile.js
 
 
-<img src="/server.png" align=center width=300 height=500 alt="Project Home">
+<img src="/server.png" alt="Project Home">
 
 
 
