@@ -1,9 +1,9 @@
 # Pre Req
 
-  *Setup ESAC project in Home Directory.
-  *Setup pointcloudvisar project in Home Directory
-  *Setup Col-Map reconstruction folder in Home Directory.
-  *Change the folder-name in apifile.js
+  -  Setup ESAC project in Home Directory.
+  -  Setup pointcloudvisar project in Home Directory
+  -  Setup Col-Map reconstruction folder in Home Directory.
+  -  Change the folder-name in apifile.js
 
 # Howto run
 
