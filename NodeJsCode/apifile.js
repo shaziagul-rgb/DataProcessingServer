@@ -49,23 +49,6 @@ function getRandomFileName() {
    return random_number;
    }
 
-function CreateNewFolderIfNotExist(foldername)
-{
-   
-    // if(fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername))
-    // {
-    //     rimraf("/home/shazia/esac/datasets/fbs/"+foldername, function () { console.log("done"); });
-    //    // fs.rmdirSync("/home/shazia/esac/datasets/fbs/"+foldername, { recursive: true });
-    //     // fs.rmdir("/home/shazia/esac/datasets/fbs/"+foldername);
-    //     console.log("Already Exist");
-    // }
-    // else
-    // {
-
-         fs.mkdirSync(foldername+"/home/shazia/esac/datasets/fbs/");
-         console.log(foldername+"Created folder");
-   // }
-}
 
 function DelFolderData()
 {
@@ -161,16 +144,43 @@ app.post('/upload-image', rawBody, function (req, res) {
 
 
 
+
        // TODO save image (req.rawBody) somewhere
 
    
 app.post('/runBatchFile',function(req,res)
 {
-    const { exec } = require('child_process');
-    fs.unlinkSync(foldername+"esac/environments/fbs/poses_esac_.txt")
+   // const { exec } = require('child_process');
+  //  fs.unlinkSync(foldername+"esac/environments/fbs/poses_esac_.txt")
 
-    exec( foldername+"ARscript.sh");
-    console.log("Batch FIle");
+   // exec( foldername+"ARscript.sh");
+   // console.log("Batch FIle");
+
+    // Child process is required to spawn any kind of asynchronous process
+var childProcess = require("child_process");
+// This line initiates bash
+var script_process = childProcess.spawn('/bin/bash',['/home/shazia/ARscript.sh'],{env: process.env});
+// Echoes any command output 
+script_process.stdout.on('data', function (data) {
+  console.log('stdout: ' + data);
+});
+// Error output
+script_process.stderr.on('data', function (data) {
+  console.log('stderr: ' + data);
+});
+// Process exit
+script_process.on('close', function (code) {
+  console.log('child process exited with code ' + code);
+  fs.readFile(foldername+"esac/environments/fbs/poses_esac_.txt", function (err, data) {
+  res.end(data);
+  const { exec } = require('child_process');
+  exec( foldername+"GVisBatch.sh");
+  console.log("GVIS Batch FIle Executed");
+
+});
+  
+});
+
 });
 app.post('/runCronJob',function(req,res)
 {
