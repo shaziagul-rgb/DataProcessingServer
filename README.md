@@ -1,4 +1,4 @@
-# Pre Req
+# Pre-Requisite
 
   -  Setup ESAC project in Home Directory.
   -  Setup pointcloudvisar project in Home Directory
@@ -9,7 +9,7 @@
 
 Run the server application by executing the following commands.
 
-cd ARSpecServer/NodeJsCode
+cd NodeJsCode
 
 node apifile.js
 
