@@ -111,6 +111,7 @@ app.post('/createfolder',function(req,res)
 {
     console.log("Create Folder API Called");
     DelFolderData();
+    console.log("Data Deleted Sucessfully");
     res.status(200, {status: 'Folder Created Successfull'});
 });
 
@@ -175,7 +176,7 @@ script_process.on('close', function (code) {
   res.end(data);
   const { exec } = require('child_process');
   exec( foldername+"GVisBatch.sh");
-  console.log("GVIS Batch FIle Executed");
+  console.log("GVIS Batch File Executed");
 
 });
   
@@ -195,3 +196,8 @@ app.get('/readPosesfile',function(req,res)
   app.listen(port, () => {
     console.log(`Server app listening at http://localhost:${port}`)
   })
+
+  app.get('/checkConnection',function(req,res)
+  {
+         res.send(200, {status: 'OK'});
+  });
