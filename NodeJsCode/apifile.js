@@ -107,20 +107,34 @@ function DelFolderData() {
 
 app.post('/createfolder', function (req, res) {
   console.log("Create Folder API Called");
-  DelFolderData();
-  console.log("Data Deleted Sucessfully");
+  CreateNewFolderIfNotExist("Sallman");
+ // DelFolderData();
+ // console.log("Data Deleted Sucessfully");
   res.status(200, { status: 'Folder Created Successfull' });
 });
 
 app.post('/upload-image', rawBody, function (req, res) {
+  //658.999
+  //3054.54 Iphone 12 focal length
+
+ DelFolderData();
 
   if (req.rawBody && req.bodyLength > 0) {
 
+
+    const data=fs.readFileSync(foldername + "esac/datasets/fbs/test.txt", 'utf8' , (err, data) => {
+      if (err) {
+        console.error(data)
+        return
+      }
+      console.log(data)
+    })
+    
     fs.writeFile(foldername + "esac/datasets/fbs/test/rgb/" + filecounter + ".jpg", req.rawBody, err => {
       if (err) throw err;
       filecounter++;
     })
-    fs.writeFile(foldername + "esac/datasets/fbs/test/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt", "658.999", err => {
+    fs.writeFile(foldername + "esac/datasets/fbs/test/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",data.toString(), err => {
       if (err) throw err;
 
     })
@@ -141,7 +155,23 @@ app.post('/upload-image', rawBody, function (req, res) {
 
 });
 
+function CreateNewFolderIfNotExist(foldername)
+{
+  try {
+    if (!fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername)) {
+      fs.mkdirSync("/home/shazia/esac/datasets/fbs/"+foldername)
+    }
 
+   else if (fs.existsSync("/home/shazia/esac/datasets/fbs/"+foldername)) {console.log("FOlder Exist");}
+  }
+  
+  
+  
+    catch (err) {
+    console.error(err)
+  }
+   
+}
 
 
 // TODO save image (req.rawBody) somewhere
