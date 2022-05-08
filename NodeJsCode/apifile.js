@@ -13,8 +13,9 @@ var filecounter = 1;
 var userPath = "/home/shazia/";
 var connectedUserID="";
 var smartPhoneModel="";
-var sess;
-const param1='shazia';
+var bodyParser = require('body-parser');
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 function rawBody(req, res, next) {
   var chunks = [];
@@ -83,6 +84,10 @@ app.post('/test', rawBody, function (req, res) {
       connectedUserID=req.rawBody.toString()
      // sess.connectedUserID=req.rawBody.toString();
       console.log(connectedUserID);
+     CreateNewFolderIfNotExist("test_"+connectedUserID);
+     CreateNewFolderIfNotExist("test_"+connectedUserID+"/calibration");
+     CreateNewFolderIfNotExist("test_"+connectedUserID+"/poses");
+     CreateNewFolderIfNotExist("test_"+connectedUserID+"/rgb");
  });
 
 function DelFolderData() {
@@ -138,13 +143,22 @@ app.post('/createfolder', function (req, res) {
   res.status(200, { status: 'Folder Created Successfull' });
 });
 
-app.post('/upload-image', rawBody, function (req, res) {
+app.post('/upload-image', async (req, res)  =>  {
+  try {
+
 
  console.log("On Image Upload "+connectedUserID);
 
-  if (req.rawBody && req.bodyLength > 0) {
+ // if (req.rawBody && req.bodyLength > 0) {
+    let json = req.body;
 
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+connectedUserID+"/rgb/" + filecounter + ".jpg", req.rawBody, err => {
+ var buffer = json["pngData"];
+ var userid = json["userId"]
+ console.log( "userid",userid);
+ console.log( "buffer",buffer);
+ const fileContents = new Buffer(buffer, 'base64')
+
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+connectedUserID+"/rgb/" + filecounter + ".jpg", fileContents, err => {
       if (err) throw err;
      //filecounter++;
     })
@@ -157,11 +171,13 @@ app.post('/upload-image', rawBody, function (req, res) {
       if (err) throw err;
 
     })
-    res.send('Image Sent Successfully to the server');
-   
-  } else {
-    res.send(500);
+    res.send('Image Sent Successfully to the server, The counter is '+filecounter);
   }
+  catch (err) {
+    console.error(err);
+  }
+  
+  
 
 });
 
@@ -256,6 +272,6 @@ app.listen(port, () => {
 })
 
 app.get('/checkConnection', function (req, res) {
-  DelFolderData();
+  //DelFolderData();
   res.send(200, { status: 'Connected' });
 });
