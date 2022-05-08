@@ -10,12 +10,13 @@ var lineReader = require('line-reader');
 const readline = require('readline');
 const path = require('path');
 var filecounter = 1;
-var userPath = "/home/shazia/";
 var connectedUserID="";
+var userPath = "/home/shazia/";
 var smartPhoneModel="";
 var bodyParser = require('body-parser');
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 
 function rawBody(req, res, next) {
   var chunks = [];
@@ -154,24 +155,42 @@ app.post('/upload-image', async (req, res)  =>  {
 
  var buffer = json["pngData"];
  var userid = json["userId"]
+ var mobileModel = json["MobileModel"]
  console.log( "userid",userid);
  console.log( "buffer",buffer);
+ console.log( "Mobile Model",mobileModel);
+
  const fileContents = new Buffer(buffer, 'base64')
 
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+connectedUserID+"/rgb/" + filecounter + ".jpg", fileContents, err => {
+
+ 
+
+console.log("smartPhoneModel"+smartPhoneModel);
+
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
       if (err) throw err;
      //filecounter++;
     })
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+connectedUserID+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",smartPhoneModel, err => {
-      if (err) throw err;
 
-    })
+    const data=fs.readFile(userPath+'MobCalib.txt', 'utf8', function read(err, data) { if (err) { throw err; } 
+ data = JSON.parse(data); 
+  for (var key in data) { 
+   console.log("User key"+data[0][mobileModel]);
+   smartPhoneModel=data[0][mobileModel];
+   fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",smartPhoneModel, err => {
+    if (err) throw err;
+
+  })
+  
+  }
+});
+  
     array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+connectedUserID+"/poses/" + filecounter + ".jpg" + ".poses" + ".txt", array, err => {
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/poses/" + filecounter + ".jpg" + ".poses" + ".txt", array, err => {
       if (err) throw err;
 
     })
-    res.send('Image Sent Successfully to the server, The counter is '+filecounter);
+    res.send(""+filecounter);
   }
   catch (err) {
     console.error(err);
@@ -197,9 +216,18 @@ function CreateNewFolderIfNotExist(foldername){
 }
 
 app.post('/runBatchFile', function (req, res) {
+// if (req.rawBody && req.bodyLength > 0) {
+  let json = req.body;
+
+  var ImageName = json["ImageName"];
+  var userid = json["userId"]
+  console.log( "userid",userid);
+  console.log( "Image Name",ImageName);
+  const ImageNam = new Buffer(ImageName, 'base64')
+  
   var childProcess = require("child_process");
   // This line initiates bash
-  var script_process = childProcess.exec(`"/home/shazia/ARscript.sh" "${connectedUserID}"`);
+  var script_process = childProcess.exec(`"/home/shazia/ARscript.sh" "${userid}"`);
   // Echoes any command output 
   script_process.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
@@ -213,14 +241,14 @@ app.post('/runBatchFile', function (req, res) {
   script_process.on('close', function (code) {
     console.log('child process exited with code ' + code);
     const rl = readline.createInterface({
-      input: fs.createReadStream(userPath + "esac/environments/fbs/poses_esac_"+connectedUserID+".txt"),
+      input: fs.createReadStream(userPath + "esac/environments/fbs/poses_esac_"+userid+".txt"),
       crlfDelay: Infinity
     });
     
     rl.on('line', (line) => {
 
 //      console.log(`Display: ${line}`);
-      if (line.startsWith(filecounter+".jpg")){
+      if (line.startsWith(ImageName+".jpg")){
         filecounter++;
         console.log(`Display: ${line}`);
         res.send(`${line}`)
