@@ -63,7 +63,6 @@ app.post('/test', rawBody, function (req, res) {
   if (req.rawBody && req.bodyLength > 0) {
  
        smartPhoneModel = req.rawBody.toString();
-        console.log("At Phone Model"+connectedUserID);
        
        const data=fs.readFile(userPath+'MobCalib.txt', 'utf8', function read(err, data) { if (err) { throw err; } 
       data = JSON.parse(data); 
@@ -80,16 +79,37 @@ app.post('/test', rawBody, function (req, res) {
 
  });
 
- app.post('/send-User', rawBody, function (req, res) {
+ app.post('/send-User', async (req, res)  =>{
+  try{
       //sess=req.session;
-      connectedUserID=req.rawBody.toString()
-     // sess.connectedUserID=req.rawBody.toString();
-      console.log(connectedUserID);
+      let json = req.body;
+      var connectedUserID = json["userId"]
+      var mobileModel = json["MobileModel"]
+      const data=fs.readFile(userPath+'MobCalib.txt', 'utf8', function read(err, data) { if (err) { throw err; } 
+      data = JSON.parse(data); 
+      var camCalib=data[0][mobileModel];
+      createFolders(connectedUserID);
+
+     res.send(""+camCalib);
+    }
+      )
+  }
+  
+
+    catch (err) {
+      console.error(err);
+    }
+ });
+
+
+ function createFolders(connectedUserID)
+ {
+
      CreateNewFolderIfNotExist("test_"+connectedUserID);
      CreateNewFolderIfNotExist("test_"+connectedUserID+"/calibration");
      CreateNewFolderIfNotExist("test_"+connectedUserID+"/poses");
      CreateNewFolderIfNotExist("test_"+connectedUserID+"/rgb");
- });
+ }
 
 function DelFolderData() {
 
@@ -148,7 +168,6 @@ app.post('/upload-image', async (req, res)  =>  {
   try {
 
 
- console.log("On Image Upload "+connectedUserID);
 
  // if (req.rawBody && req.bodyLength > 0) {
     let json = req.body;
@@ -156,34 +175,25 @@ app.post('/upload-image', async (req, res)  =>  {
  var buffer = json["pngData"];
  var userid = json["userId"]
  var mobileModel = json["MobileModel"]
+ var cameraCalib = json["cameraCalib"]
+
  console.log( "userid",userid);
  console.log( "buffer",buffer);
  console.log( "Mobile Model",mobileModel);
+ console.log( "cameraCalib",cameraCalib);
+
 
  const fileContents = new Buffer(buffer, 'base64')
-
-
- 
-
-console.log("smartPhoneModel"+smartPhoneModel);
 
     fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
       if (err) throw err;
      //filecounter++;
     })
 
-    const data=fs.readFile(userPath+'MobCalib.txt', 'utf8', function read(err, data) { if (err) { throw err; } 
- data = JSON.parse(data); 
-  for (var key in data) { 
-   console.log("User key"+data[0][mobileModel]);
-   smartPhoneModel=data[0][mobileModel];
-   fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",smartPhoneModel, err => {
-    if (err) throw err;
-
-  })
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",cameraCalib, err => {
+      if (err) throw err;
   
-  }
-});
+    })
   
     array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
     fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/poses/" + filecounter + ".jpg" + ".poses" + ".txt", array, err => {
@@ -201,7 +211,6 @@ console.log("smartPhoneModel"+smartPhoneModel);
 });
 
 function CreateNewFolderIfNotExist(foldername){
-  console.log("At Folder"+connectedUserID);
   try {
     if (!fs.existsSync(userPath+"esac/datasets/fbs/"+foldername)) {
       fs.mkdirSync(userPath+"esac/datasets/fbs/"+foldername)
