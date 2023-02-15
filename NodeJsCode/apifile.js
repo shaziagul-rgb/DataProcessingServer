@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const port = 3001;
 var rimraf = require("rimraf");
+const {performance} = require('perf_hooks');
 const session = require('express-session');
 var fs = require("fs");
 var cron = require('node-cron');
@@ -168,6 +169,7 @@ app.post('/upload-image', async (req, res)  =>  {
   try {
 
 
+console.time('upload Image');
 
  // if (req.rawBody && req.bodyLength > 0) {
     let json = req.body;
@@ -201,6 +203,7 @@ app.post('/upload-image', async (req, res)  =>  {
 
     })
     res.send(""+filecounter);
+    console.timeEnd('upload Image');
   }
   catch (err) {
     console.error(err);
@@ -226,8 +229,14 @@ function CreateNewFolderIfNotExist(foldername){
 
 app.post('/runBatchFile', function (req, res) {
 // if (req.rawBody && req.bodyLength > 0) {
-  let json = req.body;
+  var timerStart=0;
+  var timerEnd=0;
+  var timeSpan=0;
+  console.log("The Operation took @@@ " + (timerEnd-timerStart) + " milliseconds.")
 
+  //start the timer
+  timerStart = performance.now();
+  let json = req.body;
   var ImageName = json["ImageName"];
   var userid = json["userId"]
   console.log( "userid",userid);
@@ -253,7 +262,7 @@ app.post('/runBatchFile', function (req, res) {
       input: fs.createReadStream(userPath + "esac/environments/fbs/poses_esac_"+userid+".txt"),
       crlfDelay: Infinity
     });
-    
+
     rl.on('line', (line) => {
 
 //      console.log(`Display: ${line}`);
@@ -265,7 +274,18 @@ app.post('/runBatchFile', function (req, res) {
 
       }
      
+    
+
     });
+
+    timerEnd = performance.now();
+    timeSpan= timerEnd-timerStart;
+    console.log("The Operation took " + (timerEnd-timerStart) + " milliseconds.")
+    fs.appendFile(userPath + "esac/datasets/fbs/test_"+userid +".timer" +".txt", +"\n"+ filecounter+".jpg"+" "+timeSpan+" "+"ms"+"\n",err => {
+      if (err) throw err;
+
+    })
+    
 
   //  fs.readFile(userPath + "esac/environments/fbs/poses_esac_"+connectedUserID+"+.txt", function (err, data) {
    //   res.end(data, { status: 'ESAC Executeeeeeeeeed Successfully' });
