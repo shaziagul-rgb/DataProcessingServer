@@ -14,7 +14,11 @@ var filecounter = 1;
 var connectedUserID="";
 var userPath = "/home/shazia/";
 var smartPhoneModel="";
+var uploadstart;
+var uploadDone;
+var uploadDur;
 var bodyParser = require('body-parser');
+
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
@@ -168,7 +172,7 @@ app.post('/createfolder', function (req, res) {
 app.post('/upload-image', async (req, res)  =>  {
   try {
 
-
+uploadstart = performance.now();
 console.time('upload Image');
 
  // if (req.rawBody && req.bodyLength > 0) {
@@ -185,7 +189,18 @@ console.time('upload Image');
  console.log( "cameraCalib",cameraCalib);
 
 
- const fileContents = new Buffer(buffer, 'base64')
+   try {
+    if (!fs.existsSync(userPath + "esac/datasets/fbs/test_"+userid)) 
+    createFolders(userid)
+   }
+  
+
+   catch (err) {
+    console.error(err);
+   }
+
+    const fileContents = new Buffer(buffer, 'base64')
+
 
     fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
       if (err) throw err;
@@ -203,7 +218,10 @@ console.time('upload Image');
 
     })
     res.send(""+filecounter);
-    console.timeEnd('upload Image');
+    uploadDone = performance.now();
+    uploadDur=uploadDone-uploadstart;
+    console.log( "Uploaded in ",uploadDur);
+
   }
   catch (err) {
     console.error(err);
@@ -227,12 +245,12 @@ function CreateNewFolderIfNotExist(foldername){
    
 }
 
+
 app.post('/runBatchFile', function (req, res) {
 // if (req.rawBody && req.bodyLength > 0) {
   var timerStart=0;
   var timerEnd=0;
   var timeSpan=0;
-  console.log("The Operation took @@@ " + (timerEnd-timerStart) + " milliseconds.")
 
   //start the timer
   timerStart = performance.now();
@@ -278,13 +296,22 @@ app.post('/runBatchFile', function (req, res) {
 
     });
 
+    
+
     timerEnd = performance.now();
     timeSpan= timerEnd-timerStart;
-    console.log("The Operation took " + (timerEnd-timerStart) + " milliseconds.")
-    fs.appendFile(userPath + "esac/datasets/fbs/test_"+userid +".timer" +".txt", +"\n"+ filecounter+".jpg"+" "+timeSpan+" "+"ms"+"\n",err => {
+    var totalTime=uploadDur+timeSpan;
+    console.log("The Upload took =" + (uploadDur) + " milliseconds.")
+    console.log("The Operation took =" + (timerEnd-timerStart) + " milliseconds.")
+    console.log("The Total Time =" + (totalTime) + " in milliseconds.")
+    //var output= "Upload Time = ,"+uploadDur + "ESAC Execution Time= ," + timeSpan + "Total Time = ,"+totalTime;
+    var data= uploadDur +","+ timeSpan+"," +totalTime;
+  
+    fs.appendFile(userPath + "esac/datasets/fbs/test_"+userid +".timer" +".csv", +"\n"+ filecounter+".jpg"+", "+data+" "+"\n",err => {
       if (err) throw err;
 
     })
+
     
 
   //  fs.readFile(userPath + "esac/environments/fbs/poses_esac_"+connectedUserID+"+.txt", function (err, data) {
