@@ -1,7 +1,7 @@
 const { timeStamp, debug } = require('console');
 const express = require('express')
 const app = express()
-const port = 3001;
+const port = 7001;
 var rimraf = require("rimraf");
 const {performance} = require('perf_hooks');
 const session = require('express-session');
@@ -118,9 +118,9 @@ app.post('/test', rawBody, function (req, res) {
 
 function DelFolderData(connectedUserID) {
 
-  const subdir1 = userPath + "esac/datasets/fbs/test_"+connectedUserID+"/rgb";
-  const subdir2 = userPath + "esac/datasets/fbs/test_"+connectedUserID+"/poses";
-  const subdir3 = userPath + "esac/datasets/fbs/test_"+connectedUserID+"/calibration";
+  const subdir1 = userPath + "esac/datasets/obcsd/test_"+connectedUserID+"/rgb";
+  const subdir2 = userPath + "esac/datasets/obcsd/test_"+connectedUserID+"/poses";
+  const subdir3 = userPath + "esac/datasets/obcsd/test_"+connectedUserID+"/calibration";
 
   fs.readdir(subdir1, (err, files) => {
     if (err) throw err;
@@ -190,7 +190,7 @@ console.time('upload Image');
 
 
    try {
-    if (!fs.existsSync(userPath + "esac/datasets/fbs/test_"+userid)) 
+    if (!fs.existsSync(userPath + "esac/datasets/obcsd/test_"+userid)) 
     createFolders(userid)
 
     else
@@ -205,18 +205,18 @@ console.time('upload Image');
     const fileContents = new Buffer(buffer, 'base64')
 
 
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
+    fs.writeFile(userPath + "esac/datasets/obcsd/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
       if (err) throw err;
      filecounter++;
     })
 
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",cameraCalib, err => {
+    fs.writeFile(userPath + "esac/datasets/obcsd/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",cameraCalib, err => {
       if (err) throw err;
   
     })
   
     array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/poses/" + filecounter + ".jpg" + ".poses" + ".txt", array, err => {
+    fs.writeFile(userPath + "esac/datasets/obcsd/test_"+userid+"/poses/" + filecounter + ".jpg" + ".poses" + ".txt", array, err => {
       if (err) throw err;
 
     })
@@ -236,8 +236,8 @@ console.time('upload Image');
 
 function CreateNewFolderIfNotExist(foldername){
   try {
-    if (!fs.existsSync(userPath+"esac/datasets/fbs/"+foldername)) {
-      fs.mkdirSync(userPath+"esac/datasets/fbs/"+foldername)
+    if (!fs.existsSync(userPath+"esac/datasets/obcsd/"+foldername)) {
+      fs.mkdirSync(userPath+"esac/datasets/obcsd/"+foldername)
     }
   
   }
@@ -266,7 +266,7 @@ app.post('/runBatchFile', function (req, res) {
   
   var childProcess = require("child_process");
   // This line initiates bash
-  var script_process = childProcess.exec(`"/home/shazia/ARscript.sh" "${userid}"`);
+  var script_process = childProcess.exec(`"/home/shazia/OBCSscript.sh" "${userid}"`);
   // Echoes any command output 
   script_process.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
@@ -280,27 +280,27 @@ app.post('/runBatchFile', function (req, res) {
   script_process.on('close', function (code) {
     console.log('child process exited with code ' + code);
     const rl = readline.createInterface({
-      input: fs.createReadStream(userPath + "esac/environments/fbs/poses_esac_"+userid+".txt"),
+      input: fs.createReadStream(userPath + "esac/environments/obcsd1/poses_esac_"+userid+".txt"),
       crlfDelay: Infinity
     });
 
     rl.on('line', (line) => {
 
 //      console.log(`Display: ${line}`);
+      
 
       if (line.startsWith(ImageName+".jpg")){
         filecounter++;
         console.log(`Display: ${line}`);
         res.send(`${line}`)
-        fs.appendFile(userPath + "esac/datasets/fbs/temp_"+userid+"/"+"poses_esac_"+userid+".txt",line+"\n",err => {
+        fs.appendFile(userPath + "esac/datasets/obcsd/temp_"+userid+"/"+"poses_esac_"+userid+".txt",line+"\n",err => {
           if (err) throw err;
     
         })
      
-      }
+    
 
     });
-  
 
     
 
@@ -313,7 +313,7 @@ app.post('/runBatchFile', function (req, res) {
     //var output= "Upload Time = ,"+uploadDur + "ESAC Execution Time= ," + timeSpan + "Total Time = ,"+totalTime;
     var data= uploadDur +","+ timeSpan+"," +totalTime;
   
-    fs.appendFile(userPath + "esac/datasets/fbs/test_"+userid +".timer" +".csv", +"\n"+ filecounter+".jpg"+", "+data+" "+"\n",err => {
+    fs.appendFile(userPath + "esac/datasets/obcsd/test_"+userid +".timer" +".csv", +"\n"+ filecounter+".jpg"+", "+data+" "+"\n",err => {
       if (err) throw err;
 
     })
@@ -338,7 +338,7 @@ app.get('/readPosesfile', function (req, res) {
   //  res.send(data);
 
     const rl = readline.createInterface({
-      input: fs.createReadStream(userPath + "esac/environments/fbs/poses_esac_"+connectedUserID+".txt"),
+      input: fs.createReadStream(userPath + "esac/environments/obcsd1/poses_esac_"+connectedUserID+".txt"),
       crlfDelay: Infinity
     });
     
