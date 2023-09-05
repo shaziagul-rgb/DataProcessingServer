@@ -207,7 +207,7 @@ console.time('upload Image');
 
     fs.writeFile(userPath + "esac/datasets/ctb/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
       if (err) throw err;
-     filecounter++;
+    // filecounter++;
     })
 
     fs.writeFile(userPath + "esac/datasets/ctb/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",cameraCalib, err => {
@@ -366,7 +366,7 @@ app.post('/runAceBatchFile', function (req, res) {
       script_process.on('close', function (code) {
         console.log('child process exited with code ' + code);
         const rl = readline.createInterface({
-          input: fs.createReadStream(userPath + "esac/environments/ctb1/poses_esac_"+userid+".txt"),
+          input: fs.createReadStream(userPath + "esac/environments/ctb/poses_esac_"+userid+".txt"),
           crlfDelay: Infinity
         });
     
@@ -424,7 +424,7 @@ app.get('/readPosesfile', function (req, res) {
   //  res.send(data);
 
     const rl = readline.createInterface({
-      input: fs.createReadStream(userPath + "esac/environments/ctb1/poses_esac_"+connectedUserID+".txt"),
+      input: fs.createReadStream(userPath + "esac/environments/ctb/poses_esac_"+connectedUserID+".txt"),
       crlfDelay: Infinity
     });
     

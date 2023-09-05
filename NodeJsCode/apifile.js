@@ -182,7 +182,7 @@ console.time('upload Image');
  var userid = json["userId"]
  var mobileModel = json["MobileModel"]
  var cameraCalib = json["cameraCalib"]
- var imgName = json["imageName"]
+ var ImageName = json["ImageName"];
  console.log( "userid",userid);
  console.log( "buffer",buffer);
  console.log( "Mobile Model",mobileModel);
@@ -193,8 +193,8 @@ console.time('upload Image');
     if (!fs.existsSync(userPath + "esac/datasets/fbs/test_"+userid)) 
     createFolders(userid)
 
-    else
-    DelFolderData(userid);
+   // else
+    //DelFolderData(userid);
    }
   
 
@@ -205,18 +205,18 @@ console.time('upload Image');
     const fileContents = new Buffer(buffer, 'base64')
 
 
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/rgb/" + filecounter + ".jpg", fileContents, err => {
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/rgb/" + ImageName + ".jpg", fileContents, err => {
       if (err) throw err;
      filecounter++;
     })
-
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/calibration/" + filecounter + ".jpg" + ".calibration" + ".txt",cameraCalib, err => {
+  
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/calibration/" + ImageName + ".jpg" + ".calibration" + ".txt",cameraCalib, err => {
       if (err) throw err;
   
     })
   
     array = "1 0 0 0\n0 1 0 0\n0 0 1 0\n0 0 0 1";
-    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/poses/" + filecounter + ".jpg" + ".poses" + ".txt", array, err => {
+    fs.writeFile(userPath + "esac/datasets/fbs/test_"+userid+"/poses/" + ImageName + ".jpg" + ".poses" + ".txt", array, err => {
       if (err) throw err;
 
     })
@@ -247,6 +247,8 @@ function CreateNewFolderIfNotExist(foldername){
   }
    
 }
+
+
 
 
 app.post('/runBatchFile', function (req, res) {
@@ -331,6 +333,90 @@ app.post('/runBatchFile', function (req, res) {
 
   });
 
+  app.post('/runAceBatchFile', function (req, res) {
+    // if (req.rawBody && req.bodyLength > 0) {
+      var timerStart=0;
+      var timerEnd=0;
+      var timeSpan=0;
+    
+      //start the timer
+      timerStart = performance.now();
+      let json = req.body;
+      var ImageName = json["ImageName"];
+      var userid = json["userId"]
+      console.log( "userid",userid);
+      console.log( "Image Name",ImageName);
+      const ImageNam = new Buffer(ImageName, 'base64')
+      
+      var childProcess = require("child_process");
+      // This line initiates bash
+      var script_process = childProcess.exec(`"/home/shazia/fbs.sh" "${userid}"`);
+      // Echoes any command output 
+      script_process.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    
+      });
+      // Error output
+      script_process.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+      });
+      // Process exit
+      script_process.on('close', function (code) {
+        console.log('child process exited with code ' + code);
+        const rl = readline.createInterface({
+          input: fs.createReadStream(userPath + "ace/output/fbs/merged_poses_4.txt"),
+          crlfDelay: Infinity
+        });
+    
+        
+    
+        rl.on('line', (line) => {
+    //
+         // if (line.startsWith(ImageName+".jpg")){
+          //  filecounter++;
+            //console.log(`ImageName: ${ImageName}`);
+            console.log(`Display: ${line}`);
+            res.send(`${line}`)
+            fs.appendFile(userPath + "ace/datasets/fbs/"+"poses_ace_"+userid+".txt",line+"\n",err => {
+              if (err) throw err;
+        
+            })
+            //return;
+    
+          });
+         
+        
+    
+       // });
+    
+        
+    
+        timerEnd = performance.now();
+        timeSpan= timerEnd-timerStart;
+        var totalTime=uploadDur+timeSpan;
+        console.log("The Upload took =" + (uploadDur) + " milliseconds.")
+        console.log("The Operation took =" + (timerEnd-timerStart) + " milliseconds.")
+        console.log("The Total Time =" + (totalTime) + " in milliseconds.")
+        //var output= "Upload Time = ,"+uploadDur + "ESAC Execution Time= ," + timeSpan + "Total Time = ,"+totalTime;
+        var data= uploadDur +","+ timeSpan+"," +totalTime;
+      
+        fs.appendFile(userPath + "ace/datasets/fbs/test_"+userid +".timer" +".csv", +"\n"+ filecounter+".jpg"+", "+data+" "+"\n",err => {
+          if (err) throw err;
+    
+        })
+    
+        
+    
+      //  fs.readFile(userPath + "esac/environments/ctb/poses_esac_"+connectedUserID+"+.txt", function (err, data) {
+       //   res.end(data, { status: 'ESAC Executeeeeeeeeed Successfully' });
+        
+       //   const { exec } = require('child_process');
+        //  exec(userPath+ "GVisBatch.sh");
+       //   console.log("GVIS Batch File Executed");
+    
+        });
+    
+      });
 
 
 app.get('/readPosesfile', function (req, res) {
