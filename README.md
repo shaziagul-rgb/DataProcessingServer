@@ -22,7 +22,6 @@ Unity / C# AR Application
           |
           | Store and prepare data
           v
-    Deep-Learning
  Pose Estimation Pipeline
        |         |
       Deep Learning
@@ -76,28 +75,6 @@ The typical workflow is:
 * C#
 * Deep learning
 * Camera pose estimation
-
-
-## Project Structure
-
-```text
-ARProcessingServer/
-│
-├── server.js
-├── package.json
-├── README.md
-├── .gitignore
-├── .env.example
-│
-├── scripts/
-│   ├── ARscript.sh
-│   └── fbs.sh
-│
-└── config/
-    └── MobCalib.example.json
-```
-
-The exact structure may vary depending on the configuration of the pose estimation pipelines.
 
 ## Requirements
 
