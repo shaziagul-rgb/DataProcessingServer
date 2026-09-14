@@ -1,17 +1,3 @@
-# Pre-Requisite
-
-  -  Setup ESAC project in Home Directory.
-  -  Setup pointcloudvisar project in Home Directory
-  -  Setup Col-Map reconstruction folder in Home Directory.
-  -  Change the folder-name in apifile.js
-
-# Howto run
-
-Run the server application by executing the following commands.
-
-cd NodeJsCode
-
-node apifile.js
 
 # ARProcessingServer
 
@@ -329,12 +315,16 @@ Configuration details may vary depending on the experimental environment.
 
 Add the appropriate license for this research software.
 
+
 ## Citation
 
 If you use this software in academic research, please cite the associated research publication:
 
 ```text
-Add publication citation here.
+Gul, S., Lo, W. H., Mills, S., & Zollmann, S. (2023, November).
+Benchmarking Localization for Augmented Reality in Large Scale Environments.
+In 2023 38th International Conference on Image and Vision Computing New Zealand
+(IVCNZ) (pp. 1–6). IEEE.
 ```
 
 
