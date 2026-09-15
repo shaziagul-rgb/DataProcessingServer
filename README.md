@@ -1,11 +1,11 @@
 
-# ARProcessingServer
+# DataProcessingServer
 
 Node.js server for processing augmented reality (AR) camera data and interfacing with a Linux-based deep-learning camera pose estimation pipeline.
 
 ## Overview
 
-**ARProcessingServer** provides the communication and processing layer between the Mobile/Unity C# AR application and the deep‑learning–based pose‑estimation pipeline running in a Linux environment. It manages image transmission, preprocessing, model inference, pose post‑processing, and returns the final 6‑DoF camera pose to the mobile client for AR rendering and evaluation.
+**ProcessingServer** provides the communication and processing layer between the Mobile/Unity C# AR application and the deep‑learning–based pose‑estimation pipeline running in a Linux environment. It manages image transmission, preprocessing, model inference, pose post‑processing, and returns the final 6‑DoF camera pose to the mobile client for AR rendering and evaluation.
 
 The server receives camera images and camera calibration information from the mobile application, stores and prepares the data on the Linux system, starts the required pose estimation processing through external batch scripts, retrieves the resulting camera pose data, and sends the results back to the mobile client.
 
@@ -17,7 +17,7 @@ Unity / C# AR Application
           | Camera image
           | Camera calibration
           v
-   ARProcessingServer
+   DataProcessingServer
        (Node.js)
           |
           | Store and prepare data
@@ -30,16 +30,16 @@ Unity / C# AR Application
             |
             | Estimated camera pose
             v
-   ARProcessingServer
+   DataProcessingServer
           |
           | Pose data
-          v
+          
 Unity / C# AR Application
 ```
 
 ## Main Responsibilities
 
-ARProcessingServer is responsible for:
+DataProcessingServer is responsible for:
 
 * Receiving camera images — Processes incoming frames sent from the Unity application.
 * Receiving camera calibration information — Stores intrinsic camera parameters required for pose estimation.
@@ -56,12 +56,12 @@ ARProcessingServer is responsible for:
 The typical workflow is:
 
 1. The Unity/C# application captures an image using the mobile device camera.
-2. The image and camera calibration information are sent to ARProcessingServer.
+2. The image and camera calibration information are sent to DataProcessingServer.
 3. The server stores the image and associated information on the Linux system.
 4. The server starts the required pose estimation pipeline using an external script.
 5. The deep-learning pipeline processes the image and estimates the camera pose.
 6. The resulting pose data is written to an output file.
-7. ARProcessingServer reads the pose corresponding to the processed image.
+7. DataProcessingServer reads the pose corresponding to the processed image.
 8. The pose data is returned to the Unity/C# application.
 9. Processing times can be recorded for performance evaluation.
 
@@ -94,7 +94,7 @@ Clone the repository:
 
 ```bash
 git clone 
-cd ARProcessingServer
+cd DataProcessingServer
 ```
 
 Install the Node.js dependencies:
@@ -263,7 +263,7 @@ These measurements can be used to evaluate the performance of the AR processing 
 
 ## Research Context
 
-ARProcessingServer was developed as part of research into large-scale outdoor augmented reality and camera pose estimation.
+DataProcessingServer was developed as part of research into large-scale outdoor augmented reality and camera pose estimation.
 
 The server provides the infrastructure required to connect a mobile AR application with server-side deep-learning pose estimation methods.
 
@@ -280,7 +280,7 @@ The deep-learning pose estimation methods and other research components may be m
 To reproduce the complete system, the following components are required:
 
 1. Unity/C# client application
-2. ARProcessingServer
+2. DataProcessingServer
 3. Linux-based deep-learning pose estimation pipeline
 4. Required model files and dependencies
 5. Camera calibration data
